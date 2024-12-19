@@ -12,7 +12,8 @@ venv/
 *.db
 
 # Images and Reports
-
+images/
+reports/
 
 # IDE
 .vscode/
