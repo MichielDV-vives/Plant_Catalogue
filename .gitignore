@@ -12,8 +12,6 @@ venv/
 *.db
 
 # Images and Reports
-plant_images/
-reports/
 
 # IDE
 .vscode/
