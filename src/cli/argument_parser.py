@@ -9,7 +9,6 @@ def create_parser() -> ArgumentParser:
         'search-plant',
         'report',
         'edit-plant',
-        'export-csv',
         'add-leaf',
         'leaf-stats'
     ])
