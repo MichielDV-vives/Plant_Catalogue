@@ -32,7 +32,7 @@ class DatabaseManager:
                 plant.name,
                 plant.family,
                 plant.image_path,
-                plant.age
+                plant.birthdate.isoformat() if plant.birthdate else None
             ))
             conn.commit()
             return cursor.lastrowid
@@ -57,7 +57,7 @@ class DatabaseManager:
 
     def edit_plant(self, plant_id: int, name: Optional[str] = None,
                    family: Optional[str] = None, image_path: Optional[str] = None,
-                   age: Optional[int] = None) -> bool:
+                   birthdate: Optional[datetime] = None) -> bool:
         # Check if plant exists
         if not self.get_plant_by_id(plant_id):
             return False
@@ -68,7 +68,7 @@ class DatabaseManager:
                 name,
                 family,
                 image_path,
-                age,
+                birthdate.isoformat() if birthdate else None,
                 plant_id
             ))
             conn.commit()

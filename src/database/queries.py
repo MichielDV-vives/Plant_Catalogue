@@ -1,10 +1,11 @@
+
 CREATE_PLANTS_TABLE = '''
     CREATE TABLE IF NOT EXISTS plants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         family TEXT NOT NULL,
         image_path TEXT,
-        age INTEGER,
+        birthdate TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_leaf_date TIMESTAMP
     )
@@ -20,8 +21,8 @@ CREATE_LEAF_RECORDS_TABLE = '''
 '''
 
 INSERT_PLANT = '''
-    INSERT INTO plants (name, family, image_path, age)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO plants (name, family, image_path, birthdate, created_at)
+    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
 '''
 
 SEARCH_PLANTS = '''
@@ -34,10 +35,9 @@ UPDATE_PLANT = '''
     SET name = COALESCE(?, name),
         family = COALESCE(?, family),
         image_path = COALESCE(?, image_path),
-        age = COALESCE(?, age)
+        birthdate = COALESCE(?, birthdate)
     WHERE id = ?
 '''
-
 GET_PLANT_BY_ID = '''
     SELECT * FROM plants
     WHERE id = ?

@@ -3,6 +3,8 @@ import configparser
 import os
 from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
+
 from models.plant import Plant
 from database.db_manager import DatabaseManager
 from utils.report_generator import ReportGenerator
@@ -33,7 +35,23 @@ def main() -> None:
     if args.command == 'list':
         results = db.get_all_plants()
         if results:
-            print(tabulate(results, headers=['ID', 'Name', 'Family', 'Image', 'Age', 'Added Date']))
+            headers = ['ID', 'Name', 'Family', 'Image Path', 'Birthdate', 'Created At', 'Last Leaf Date']
+            # Format datetime objects for better display
+            formatted_results = []
+            for row in results:
+                formatted_row = list(row)
+                # Format birthdate (index 4)
+                if formatted_row[4]:
+                    formatted_row[4] = datetime.fromisoformat(formatted_row[4]).strftime('%Y-%m-%d')
+                # Format created_at (index 5)
+                if formatted_row[5]:
+                    formatted_row[5] = datetime.fromisoformat(formatted_row[5]).strftime('%Y-%m-%d')
+                # Format last_leaf_date (index 6)
+                if formatted_row[6]:
+                    formatted_row[6] = datetime.fromisoformat(formatted_row[6]).strftime('%Y-%m-%d')
+                formatted_results.append(formatted_row)
+
+            print(tabulate(formatted_results, headers=headers, tablefmt='simple'))
         else:
             print("No plants found")
         return
@@ -42,19 +60,26 @@ def main() -> None:
         image_path = None
         if args.image:
             image_path = image_handler.save_image(args.image, args.name)
+
+        birthdate = None
+        if args.age_months:
+            birthdate = datetime.now() - relativedelta(months=args.age_months)
+
         plant = Plant(
             name=args.name,
             family=args.family,
             image_path=image_path,
-            age=args.age or 0
+            birthdate=birthdate,
+            created_at=datetime.now()
         )
         plant_id = db.add_plant(plant)
         print(f"Plant added successfully with ID: {plant_id}")
 
+
     elif args.command == 'search-plant':
         results = db.search_plants(args.query)
         if results:
-            print(tabulate(results, headers=['ID', 'Name', 'Family', 'Image', 'Age', 'Added Date']))
+            print(tabulate(results, headers=['ID', 'Name', 'Family', 'Image Path', 'Birthdate', 'Created At', 'Last Leaf Date']))
         else:
             print("No plants found")
 
@@ -69,6 +94,10 @@ def main() -> None:
         if not current_plant:
             print(f"No plant found with ID {args.id}")
             return
+        # Calculate birthdate from age_months if provided
+        birthdate = None
+        if args.age_months:
+            birthdate = datetime.now() - relativedelta(months=args.age_months)
 
         # Update plant with new values, keeping existing values if not provided
         updated = db.edit_plant(
@@ -76,7 +105,7 @@ def main() -> None:
             name=args.name,
             family=args.family,
             image_path=image_path,
-            age=args.age
+            birthdate=birthdate,
         )
 
         if updated:
@@ -85,7 +114,7 @@ def main() -> None:
             plant = db.get_plant_by_id(args.id)
             if plant:
                 print("\nUpdated plant details:")
-                print(tabulate([plant], headers=['ID', 'Name', 'Family', 'Image', 'Age', 'Added Date']))
+                print(tabulate([plant], headers=['ID', 'Name', 'Family', 'Image Path', 'Birthdate', 'Created At', 'Last Leaf Date']))
         else:
             print("Failed to update plant")
 

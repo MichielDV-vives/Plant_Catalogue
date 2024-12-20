@@ -6,7 +6,7 @@ from typing import Optional, List
 class Plant:
     name: str
     family: str
-    age: int
+    birthdate: Optional[datetime] = None
     id: Optional[int] = None
     image_path: Optional[str] = None
     created_at: Optional[datetime] = None
@@ -20,7 +20,7 @@ class Plant:
             name=row[1],
             family=row[2],
             image_path=row[3],
-            age=row[4],
+            birthdate=datetime.fromisoformat(row[4]) if row[4] else None,
             created_at=datetime.fromisoformat(row[5]) if row[5] else None,
             last_leaf_date=datetime.fromisoformat(row[6]) if row[6] else None
         )
