@@ -1,5 +1,5 @@
-import csv
 from pathlib import Path
+import csv
 from typing import List, Tuple, Dict
 from configparser import ConfigParser
 from datetime import datetime

@@ -2,9 +2,7 @@
 import configparser
 import os
 from datetime import datetime
-
 from dateutil.relativedelta import relativedelta
-
 from models.plant import Plant
 from database.db_manager import DatabaseManager
 from utils.report_generator import ReportGenerator
@@ -12,13 +10,11 @@ from utils.image_handler import ImageHandler
 from cli.argument_parser import create_parser, validate_args
 from tabulate import tabulate
 
-
 def create_data_folders():
     folders = ['data', 'data/reports', 'data/images']
     for folder in folders:
         if not os.path.exists(folder):
             os.makedirs(folder)
-
 
 def main() -> None:
     create_data_folders()
@@ -59,7 +55,7 @@ def main() -> None:
     if args.command == 'add-plant':
         image_path = None
         if args.image:
-            image_path = image_handler.save_image(args.image, args.name)
+            image_path = image_handler.save_image(args.image, args.name, args.family)
 
         birthdate = None
         if args.age_months:
@@ -75,7 +71,6 @@ def main() -> None:
         plant_id = db.add_plant(plant)
         print(f"Plant added successfully with ID: {plant_id}")
 
-
     elif args.command == 'search-plant':
         results = db.search_plants(args.query)
         if results:
@@ -87,13 +82,12 @@ def main() -> None:
         # Handle image if provided
         image_path = None
         if args.image:
-            image_path = image_handler.save_image(args.image, args.name or f"plant_{args.id}")
+            current_plant = db.get_plant_by_id(args.id)
+            if not current_plant:
+                print(f"No plant found with ID {args.id}")
+                return
+            image_path = image_handler.save_image(args.image, current_plant[1], current_plant[2])
 
-        # Get current plant details
-        current_plant = db.get_plant_by_id(args.id)
-        if not current_plant:
-            print(f"No plant found with ID {args.id}")
-            return
         # Calculate birthdate from age_months if provided
         birthdate = None
         if args.age_months:
@@ -165,7 +159,5 @@ def main() -> None:
             db.export_leaf_data(default_filename)
             print(f"Leaf statistics successfully exported to: {default_filename}")
 
-
 if __name__ == "__main__":
     main()
-
