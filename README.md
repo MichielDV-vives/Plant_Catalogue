@@ -20,6 +20,7 @@ A command-line application to manage your plant collection.
 - `python src/main.py edit-plant`: Change attributes of plants
 - `python src/main.py add-leaf`: Add a leaf to the plant
 - `python src/main.py leaf-stats`: Generate CSV of your collection leaf status
+- `python src/main.py show-image`: Show image of a plant
 
 ### Usage Example
 
@@ -52,6 +53,9 @@ In terminal at /plant_catalogue
 - Show leaf statistics of a specific plant
 `python src/main.py leaf-stats --id 2`  
 
+- Show image of a specific plant
+`python src/main.py show-iamge --id 2`  
+
 
 
 
@@ -69,6 +73,8 @@ plant_catalogue/
 │   │   └── queries.py
 │   ├── utils/
 │   │   ├── image_handler.py
+│   │   ├── image_processor.py
+│   │   ├── image_viewer.py
 │   │   └── report_generator.py
 │   └── cli/
 │       └── argument_parser.py

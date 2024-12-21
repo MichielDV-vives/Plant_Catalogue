@@ -140,5 +140,5 @@ class DatabaseManager:
             return
 
         viewer = ImageViewer()
-        viewer.show_image(plant[3], f"Plant: {plant[1]}")  # plant[1] is the name
+        viewer.show_image(plant[3], f"Plant: {plant[1]} {plant[2]}")
 
