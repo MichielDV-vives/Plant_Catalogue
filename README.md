@@ -23,7 +23,7 @@ A command-line application to manage your plant collection.
 
 ### Usage Example
 
-In terminal at /src
+In terminal at /plant_catalogue
 
 - Help
 `python src/main.py -h`

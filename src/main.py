@@ -53,9 +53,12 @@ def main() -> None:
         return
 
     if args.command == 'add-plant':
-        image_path = None
+        image_data = None
+        image_mime_type = None
         if args.image:
-            image_path = image_handler.save_image(args.image, args.name, args.family)
+            image_result = image_handler.read_image(args.image)
+            if image_result:
+                image_data, image_mime_type = image_result
 
         birthdate = None
         if args.age_months:
@@ -64,53 +67,51 @@ def main() -> None:
         plant = Plant(
             name=args.name,
             family=args.family,
-            image_path=image_path,
+            image_data=image_data,
+            image_mime_type=image_mime_type,
             birthdate=birthdate,
             created_at=datetime.now()
         )
         plant_id = db.add_plant(plant)
         print(f"Plant added successfully with ID: {plant_id}")
 
-    elif args.command == 'search-plant':
-        results = db.search_plants(args.query)
-        if results:
-            print(tabulate(results, headers=['ID', 'Name', 'Family', 'Image Path', 'Birthdate', 'Created At', 'Last Leaf Date']))
-        else:
-            print("No plants found")
+
 
     elif args.command == 'edit-plant':
-        # Handle image if provided
-        image_path = None
+        image_data = None
+        image_mime_type = None
         if args.image:
-            current_plant = db.get_plant_by_id(args.id)
-            if not current_plant:
-                print(f"No plant found with ID {args.id}")
-                return
-            image_path = image_handler.save_image(args.image, current_plant[1], current_plant[2])
+            image_result = image_handler.read_image(args.image)
+            if image_result:
+                image_data, image_mime_type = image_result
 
-        # Calculate birthdate from age_months if provided
         birthdate = None
         if args.age_months:
             birthdate = datetime.now() - relativedelta(months=args.age_months)
 
-        # Update plant with new values, keeping existing values if not provided
         updated = db.edit_plant(
             plant_id=args.id,
             name=args.name,
             family=args.family,
-            image_path=image_path,
+            image_data=image_data,
+            image_mime_type=image_mime_type,
             birthdate=birthdate,
         )
 
         if updated:
             print(f"Plant with ID {args.id} updated successfully")
-            # Show updated plant details
             plant = db.get_plant_by_id(args.id)
             if plant:
                 print("\nUpdated plant details:")
-                print(tabulate([plant], headers=['ID', 'Name', 'Family', 'Image Path', 'Birthdate', 'Created At', 'Last Leaf Date']))
+                headers = ['ID', 'Name', 'Family', 'Image', 'MIME Type', 'Birthdate', 'Created At', 'Last Leaf Date']
+                # Format the row to show image presence instead of binary data
+                formatted_plant = list(plant)
+                formatted_plant[3] = "Yes" if formatted_plant[3] else "No"  # Replace binary data with Yes/No
+                print(tabulate([formatted_plant], headers=headers))
         else:
+
             print("Failed to update plant")
+
 
     elif args.command == 'report':
         plants = db.get_all_plants()
@@ -158,6 +159,12 @@ def main() -> None:
             default_filename = os.path.join(reports_dir, f"leaf_statistics_{datetime.now().strftime('%Y%m%d')}.csv")
             db.export_leaf_data(default_filename)
             print(f"Leaf statistics successfully exported to: {default_filename}")
+
+    elif args.command == 'show-image':
+        if not args.id:
+            print("Please provide a plant ID")
+            return
+        db.show_plant_image(args.id)
 
 if __name__ == "__main__":
     main()

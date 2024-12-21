@@ -8,7 +8,8 @@ class Plant:
     family: str
     birthdate: Optional[datetime] = None
     id: Optional[int] = None
-    image_path: Optional[str] = None
+    image_data: Optional[bytes] = None
+    image_mime_type: Optional[str] = None
     created_at: Optional[datetime] = None
     last_leaf_date: Optional[datetime] = None
     leaf_records: List[datetime] = field(default_factory=list)
@@ -19,10 +20,11 @@ class Plant:
             id=row[0],
             name=row[1],
             family=row[2],
-            image_path=row[3],
-            birthdate=datetime.fromisoformat(row[4]) if row[4] else None,
-            created_at=datetime.fromisoformat(row[5]) if row[5] else None,
-            last_leaf_date=datetime.fromisoformat(row[6]) if row[6] else None
+            image_data=row[3],
+            image_mime_type=row[4],
+            birthdate=datetime.fromisoformat(row[5]) if row[5] else None,
+            created_at=datetime.fromisoformat(row[6]) if row[6] else None,
+            last_leaf_date=datetime.fromisoformat(row[7]) if row[7] else None
         )
 
     def calculate_leaf_statistics(self) -> dict:

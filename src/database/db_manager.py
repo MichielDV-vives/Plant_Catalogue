@@ -9,6 +9,7 @@ from configparser import ConfigParser
 from models.plant import Plant
 from database.queries import CREATE_PLANTS_TABLE, INSERT_PLANT, SEARCH_PLANTS, GET_ALL_PLANTS, UPDATE_PLANT, \
     GET_PLANT_BY_ID, ADD_LEAF_RECORD, UPDATE_LAST_LEAF_DATE, GET_LEAF_RECORDS, CREATE_LEAF_RECORDS_TABLE
+from utils.image_viewer import ImageViewer
 
 
 class DatabaseManager:
@@ -31,7 +32,8 @@ class DatabaseManager:
             cursor.execute(INSERT_PLANT, (
                 plant.name,
                 plant.family,
-                plant.image_path,
+                plant.image_data,
+                plant.image_mime_type,
                 plant.birthdate.isoformat() if plant.birthdate else None
             ))
             conn.commit()
@@ -56,7 +58,8 @@ class DatabaseManager:
             return cursor.fetchone()
 
     def edit_plant(self, plant_id: int, name: Optional[str] = None,
-                   family: Optional[str] = None, image_path: Optional[str] = None,
+                   family: Optional[str] = None, image_data: Optional[bytes] = None,
+                   image_mime_type: Optional[str] = None,
                    birthdate: Optional[datetime] = None) -> bool:
         # Check if plant exists
         if not self.get_plant_by_id(plant_id):
@@ -67,7 +70,8 @@ class DatabaseManager:
             cursor.execute(UPDATE_PLANT, (
                 name,
                 family,
-                image_path,
+                image_data,
+                image_mime_type,
                 birthdate.isoformat() if birthdate else None,
                 plant_id
             ))
@@ -127,3 +131,14 @@ class DatabaseManager:
                         round(stats['avg_days_between_leaves'], 1) if stats['avg_days_between_leaves'] else None,
                         stats['days_since_last_leaf']
                     ])
+
+    def show_plant_image(self, plant_id: int) -> None:
+        """Display the image for a specific plant"""
+        plant = self.get_plant_by_id(plant_id)
+        if not plant or not plant[3] or not plant[4]:  # Check image_data and mime_type
+            print("No image available for this plant")
+            return
+
+        viewer = ImageViewer()
+        viewer.show_image(plant[3], f"Plant: {plant[1]}")  # plant[1] is the name
+

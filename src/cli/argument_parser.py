@@ -10,7 +10,8 @@ def create_parser() -> ArgumentParser:
         'report',
         'edit-plant',
         'add-leaf',
-        'leaf-stats'
+        'leaf-stats',
+        'show-image'
     ])
     parser.add_argument('--name', help='Plant name')
     parser.add_argument('--family', help='Plant family')
