@@ -31,8 +31,4 @@ class ImageViewer:
         label.image = photo  # Keep reference to prevent garbage collection
         label.pack(padx=10, pady=10)
 
-        # Add close button
-        close_btn = ttk.Button(self.window, text="Close", command=self.window.destroy)
-        close_btn.pack(pady=5)
-
         self.window.mainloop()

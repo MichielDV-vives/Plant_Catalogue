@@ -31,20 +31,25 @@ def main() -> None:
     if args.command == 'list':
         results = db.get_all_plants()
         if results:
-            headers = ['ID', 'Name', 'Family', 'Image Path', 'Birthdate', 'Created At', 'Last Leaf Date']
-            # Format datetime objects for better display
+            headers = ['ID', 'Name', 'Family', 'Image', 'MIME Type', 'Birthdate', 'Created At', 'Last Leaf Date']
             formatted_results = []
             for row in results:
-                formatted_row = list(row)
-                # Format birthdate (index 4)
-                if formatted_row[4]:
-                    formatted_row[4] = datetime.fromisoformat(formatted_row[4]).strftime('%Y-%m-%d')
-                # Format created_at (index 5)
-                if formatted_row[5]:
-                    formatted_row[5] = datetime.fromisoformat(formatted_row[5]).strftime('%Y-%m-%d')
-                # Format last_leaf_date (index 6)
-                if formatted_row[6]:
-                    formatted_row[6] = datetime.fromisoformat(formatted_row[6]).strftime('%Y-%m-%d')
+                formatted_row = []
+                for i, cell in enumerate(row):
+                    # Skip processing binary data (e.g., Image column)
+                    if i == 3:  # Assuming the binary image data is in column index 3
+                        cell = '[Binary Data]'  # Or set to an appropriate placeholder
+                    # Format date columns
+                    elif i in [5, 6, 7]:  # Indices of date columns
+                        if cell:
+                            try:
+                                cell = datetime.fromisoformat(cell).strftime('%Y-%m-%d')
+                            except (ValueError, TypeError):
+                                cell = ''  # Use an empty string for invalid or missing dates
+                    # Handle None values
+                    if cell is None:
+                        cell = ''  # Replace None with an empty string
+                    formatted_row.append(str(cell))  # Ensure all cells are strings
                 formatted_results.append(formatted_row)
 
             print(tabulate(formatted_results, headers=headers, tablefmt='simple'))

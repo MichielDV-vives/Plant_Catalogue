@@ -48,7 +48,7 @@ GET_PLANT_BY_ID = '''
 
 GET_ALL_PLANTS = '''
     SELECT * FROM plants
-    ORDER BY name
+    ORDER BY family
 '''
 
 ADD_LEAF_RECORD = '''
