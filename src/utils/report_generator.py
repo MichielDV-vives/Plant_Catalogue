@@ -6,7 +6,6 @@ from datetime import datetime
 from statistics import mean, median
 from collections import Counter
 
-
 class ReportGenerator:
     def __init__(self) -> None:
         config = ConfigParser()
@@ -17,11 +16,16 @@ class ReportGenerator:
     def _generate_statistics(self, plants: List[Tuple]) -> Dict:
         if not plants:
             return {}
-
         # Extract data from tuples (assuming order: ID, Name, Family, Image, Age, Added Date)
-        ages = [plant[4] for plant in plants if plant[4] is not None]
+        ages = []
+        for plant in plants:
+            age = plant[4]
+            if age is not None:
+                try:
+                    ages.append(float(age))  # Ensure age is a number (float)
+                except ValueError:
+                    pass  # If it's not a valid number, skip it
         families = [plant[2] for plant in plants]
-
         stats = {
             "Total Plants": len(plants),
             "Number of Families": len(set(families)),
@@ -75,9 +79,15 @@ class ReportGenerator:
                 writer.writerow([family, count])
             writer.writerow([])
 
-            # Write individual plant data
+            # Write individual plant data with placeholder for binary data
             writer.writerow(['Individual Plant Details'])
-            writer.writerow(['ID', 'Name', 'Family', 'Image Path', 'Age (Years)', 'Added Date'])
-            writer.writerows(plants)
+            writer.writerow(['ID', 'Name',  'Family', 'Image', 'Birthdate', 'Added Date'])
+
+            for plant in plants:
+                # Replace binary image data with placeholder
+                image_path = plant[3]
+                if isinstance(image_path, bytes):  # Check if it's binary data
+                    image_path = '[Binary Data]'
+                writer.writerow([plant[0], plant[1], plant[2], image_path, plant[5], plant[6]])
 
         return str(filepath)

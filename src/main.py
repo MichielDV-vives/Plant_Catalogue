@@ -134,6 +134,20 @@ def main() -> None:
             return
         db.show_plant_image(args.id)
 
+    elif args.command == 'search-plant':
+        results = db.search_plants(args.query)
+        if results:
+            processed_results = []
+            for row in results:
+                row = list(row)
+                if isinstance(row[3], bytes):  # Replace binary data in the 'Image' column
+                    row[3] = '[Binary Data]'
+                processed_results.append(row)
+            print(tabulate(processed_results,
+                           headers=['ID', 'Name', 'Family', 'Image', 'MIME Type', 'Birthdate', 'Created At', 'Last Leaf Date']))
+        else:
+            print("No plants found")
+
 
 if __name__ == "__main__":
     main()
