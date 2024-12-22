@@ -5,8 +5,9 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from models.plant import Plant
 from database.db_manager import DatabaseManager
-from utils.report_generator import ReportGenerator
 from utils.image_handler import ImageHandler
+from utils.plantdata_processor import PlantDataProcessor
+from utils.report_generator import ReportGenerator
 from cli.argument_parser import create_parser, validate_args
 from tabulate import tabulate
 
@@ -16,31 +17,11 @@ def create_data_folders():
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-def process_plant_data(args):
-    image_data = image_mime_type = None
-    if args.image:
-        image_result = image_handler.read_image(args.image)
-        if image_result:
-            image_data, image_mime_type = image_result
-
-    birthdate = None
-    if args.age_months:
-        birthdate = datetime.now() - relativedelta(months=args.age_months)
-
-    return {
-        'name': args.name,
-        'family': args.family,
-        'image_data': image_data,
-        'image_mime_type': image_mime_type,
-        'birthdate': birthdate
-    }
-
-
 def main() -> None:
     create_data_folders()
     db = DatabaseManager()
     report_gen = ReportGenerator()
-    image_handler = ImageHandler()
+    plantdataprocessor = PlantDataProcessor(ImageHandler())
 
     parser = create_parser()
     args = parser.parse_args()
@@ -78,14 +59,14 @@ def main() -> None:
         return
 
     if args.command == 'add-plant':
-        plant_data = process_plant_data(args)
+        plant_data = plantdataprocessor(args)
         plant_data['created_at'] = datetime.now()
         plant = Plant(**plant_data)
         plant_id = db.add_plant(plant)
         print(f"Plant added successfully with ID: {plant_id}")
 
     elif args.command == 'edit-plant':
-        plant_data = process_plant_data(args)
+        plant_data = plantdataprocessor(args)
         updated = db.edit_plant(plant_id=args.id, **plant_data)
 
         if updated:
@@ -152,6 +133,7 @@ def main() -> None:
             print("Please provide a plant ID")
             return
         db.show_plant_image(args.id)
+
 
 if __name__ == "__main__":
     main()
