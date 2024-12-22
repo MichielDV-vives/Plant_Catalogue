@@ -16,6 +16,26 @@ def create_data_folders():
         if not os.path.exists(folder):
             os.makedirs(folder)
 
+def process_plant_data(args):
+    image_data = image_mime_type = None
+    if args.image:
+        image_result = image_handler.read_image(args.image)
+        if image_result:
+            image_data, image_mime_type = image_result
+
+    birthdate = None
+    if args.age_months:
+        birthdate = datetime.now() - relativedelta(months=args.age_months)
+
+    return {
+        'name': args.name,
+        'family': args.family,
+        'image_data': image_data,
+        'image_mime_type': image_mime_type,
+        'birthdate': birthdate
+    }
+
+
 def main() -> None:
     create_data_folders()
     db = DatabaseManager()
@@ -58,48 +78,15 @@ def main() -> None:
         return
 
     if args.command == 'add-plant':
-        image_data = None
-        image_mime_type = None
-        if args.image:
-            image_result = image_handler.read_image(args.image)
-            if image_result:
-                image_data, image_mime_type = image_result
-
-        birthdate = None
-        if args.age_months:
-            birthdate = datetime.now() - relativedelta(months=args.age_months)
-
-        plant = Plant(
-            name=args.name,
-            family=args.family,
-            image_data=image_data,
-            image_mime_type=image_mime_type,
-            birthdate=birthdate,
-            created_at=datetime.now()
-        )
+        plant_data = process_plant_data(args)
+        plant_data['created_at'] = datetime.now()
+        plant = Plant(**plant_data)
         plant_id = db.add_plant(plant)
         print(f"Plant added successfully with ID: {plant_id}")
 
     elif args.command == 'edit-plant':
-        image_data = None
-        image_mime_type = None
-        if args.image:
-            image_result = image_handler.read_image(args.image)
-            if image_result:
-                image_data, image_mime_type = image_result
-
-        birthdate = None
-        if args.age_months:
-            birthdate = datetime.now() - relativedelta(months=args.age_months)
-
-        updated = db.edit_plant(
-            plant_id=args.id,
-            name=args.name,
-            family=args.family,
-            image_data=image_data,
-            image_mime_type=image_mime_type,
-            birthdate=birthdate,
-        )
+        plant_data = process_plant_data(args)
+        updated = db.edit_plant(plant_id=args.id, **plant_data)
 
         if updated:
             print(f"Plant with ID {args.id} updated successfully")
@@ -107,14 +94,11 @@ def main() -> None:
             if plant:
                 print("\nUpdated plant details:")
                 headers = ['ID', 'Name', 'Family', 'Image', 'MIME Type', 'Birthdate', 'Created At', 'Last Leaf Date']
-                # Format the row to show image presence instead of binary data
                 formatted_plant = list(plant)
-                formatted_plant[3] = "Yes" if formatted_plant[3] else "No"  # Replace binary data with Yes/No
+                formatted_plant[3] = "Yes" if formatted_plant[3] else "No"
                 print(tabulate([formatted_plant], headers=headers))
         else:
-
             print("Failed to update plant")
-
 
     elif args.command == 'report':
         plants = db.get_all_plants()
