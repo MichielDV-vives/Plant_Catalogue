@@ -92,7 +92,6 @@ class DatabaseManager:
             try:
                 cursor.execute(ADD_LEAF_RECORD, (plant_id, date.isoformat()))
                 conn.commit()
-                print(f"Successfully added leaf record for plant {plant_id}")
                 return True
             except sqlite3.Error as e:
                 print(f"Database error: {e}")

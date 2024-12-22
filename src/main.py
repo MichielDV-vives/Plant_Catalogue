@@ -80,8 +80,6 @@ def main() -> None:
         plant_id = db.add_plant(plant)
         print(f"Plant added successfully with ID: {plant_id}")
 
-
-
     elif args.command == 'edit-plant':
         image_data = None
         image_mime_type = None
