@@ -92,6 +92,7 @@ class DatabaseManager:
             try:
                 cursor.execute(ADD_LEAF_RECORD, (plant_id, date.isoformat()))
                 conn.commit()
+                self.update_latest_appearance_date()
                 return True
             except sqlite3.Error as e:
                 print(f"Database error: {e}")
@@ -132,7 +133,6 @@ class DatabaseManager:
                     ])
 
     def show_plant_image(self, plant_id: int) -> None:
-        """Display the image for a specific plant"""
         plant = self.get_plant_by_id(plant_id)
         if not plant or not plant[3] or not plant[4]:  # Check image_data and mime_type
             print("No image available for this plant")
@@ -141,3 +141,8 @@ class DatabaseManager:
         viewer = ImageViewer()
         viewer.show_image(plant[3], f"Plant: {plant[1]} {plant[2]}")
 
+    def update_latest_appearance_date(self) -> None:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(UPDATE_LAST_LEAF_DATE)
+            conn.commit()

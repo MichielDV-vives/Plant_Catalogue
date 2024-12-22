@@ -63,7 +63,9 @@ GET_LEAF_RECORDS = '''
 '''
 
 UPDATE_LAST_LEAF_DATE = '''
-    UPDATE plants
-    SET last_leaf_date = ?
-    WHERE id = ?
+    UPDATE plants 
+    SET last_leaf_date = (
+        SELECT MAX(appearance_date)
+        FROM leaf_records
+        WHERE leaf_records.plant_id = plants.id);
 '''
