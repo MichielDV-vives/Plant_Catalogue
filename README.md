@@ -75,6 +75,7 @@ plant_catalogue/
 │   │   ├── image_handler.py
 │   │   ├── image_processor.py
 │   │   ├── image_viewer.py
+│   │   ├── plantdata_processor.py
 │   │   └── report_generator.py
 │   └── cli/
 │       └── argument_parser.py
