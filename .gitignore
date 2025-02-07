@@ -1,25 +1,44 @@
-#
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Environment
-.env
-config.ini
+# Virtual Environment
 venv/
+env/
+ENV/
 
-# Database
-*.db
-
-# Images and Reports
-images/
-reports/
+# Project specific
+config.ini
+data/plants.db
+data/images/*
+data/reports/*
+data/qr_codes/*
+!data/images/.gitkeep
+!data/reports/.gitkeep
+!data/qr_codes/.gitkeep
+errors.log
 
 # IDE
 .vscode/
 .idea/
-
-# OS
+*.swp
+*.swo
 .DS_Store
-Thumbs.db

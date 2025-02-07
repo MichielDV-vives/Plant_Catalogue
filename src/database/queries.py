@@ -1,4 +1,3 @@
-
 CREATE_PLANTS_TABLE = '''
     CREATE TABLE IF NOT EXISTS plants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,4 +67,21 @@ UPDATE_LAST_LEAF_DATE = '''
         SELECT MAX(appearance_date)
         FROM leaf_records
         WHERE leaf_records.plant_id = plants.id);
+'''
+
+ALTER_PLANTS_TABLE_ADD_WATERING = '''
+    ALTER TABLE plants 
+    ADD COLUMN last_watered TIMESTAMP
+'''
+
+UPDATE_LAST_WATERED = '''
+    UPDATE plants
+    SET last_watered = ?
+    WHERE id = ?
+'''
+
+GET_WATERING_INFO = '''
+    SELECT last_watered
+    FROM plants
+    WHERE id = ?
 '''
